@@ -1,8 +1,11 @@
 package com.paulcera.pb_suite_api.security.controller;
 
 import com.paulcera.pb_suite_api.security.dto.LoginRequest;
+import com.paulcera.pb_suite_api.security.dto.ResponseMessage;
+import com.paulcera.pb_suite_api.security.exception.AlreadyLoggedInException;
 import com.paulcera.pb_suite_api.security.model.AuthenticationToken;
 import com.paulcera.pb_suite_api.security.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,19 +25,27 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationToken> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ResponseMessage> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        if (request.getUserPrincipal() != null) {
+            throw new AlreadyLoggedInException("Already logged in.");
+        }
+
         AuthenticationToken token = authenticationService.authenticate(loginRequest);
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new ResponseMessage("Successfully logged in.", token));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return ResponseEntity.ok("Logged out");
+    public ResponseEntity<ResponseMessage> logout(HttpServletRequest request) {
+        authenticationService.initiateLogout(request);
+
+        return ResponseEntity.ok(new ResponseMessage("Successfully logged out."));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthenticationToken> refresh() {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<ResponseMessage> refresh(HttpServletRequest request) {
+        AuthenticationToken token = authenticationService.issueNewToken(request);
+
+        return ResponseEntity.ok(new ResponseMessage("New token issued.", token));
     }
 
 }

@@ -10,14 +10,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.Instant;
 import java.util.Objects;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class RefreshToken {
 
     @Id
@@ -33,12 +29,27 @@ public class RefreshToken {
     @Column(nullable = false)
     private Instant createdDate;
 
-    @Column(nullable = false)
+    @Column
     private Instant revokedDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "web_user_id", nullable = false)
     private WebUser webUser;
+
+    public RefreshToken(String token, WebUser webUser, long expiration) {
+        this.token = token;
+        this.expiryDate = Instant.now().plusMillis(expiration);
+        this.createdDate = Instant.now();
+        this.webUser = webUser;
+    }
+
+    public void invalidate() {
+        this.revokedDate = Instant.now();
+    }
+
+    public boolean isRevoked() {
+        return revokedDate != null;
+    }
 
     @Override
     public boolean equals(Object o) {

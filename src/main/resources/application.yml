@@ -4,7 +4,7 @@ spring:
     security:
       jwt:
         secret-key: ${JWT_SECRET_KEY}
-        access-token-expiration: 86400000
+        access-token-expiration: 3600000
         refresh-token-expiration: 31536000000
   datasource:
     driver-class-name: org.postgresql.Driver
