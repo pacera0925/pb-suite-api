@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class JWTServiceImpl implements JWTService {
 
-
     private final String secretKey;
     private final long accessTokenExpiration;
     private final long refreshTokenExpiration;
