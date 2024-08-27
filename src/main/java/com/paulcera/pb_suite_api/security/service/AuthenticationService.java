@@ -59,7 +59,7 @@ public class AuthenticationService {
 
         boolean isRefreshTokenInvalid = !jwtService.isValidRefreshToken(refreshToken);
         if (isRefreshTokenInvalid) {
-            throw new InvalidRefreshTokenException();
+            throw new InvalidRefreshTokenException("RefreshToken is not valid.");
         }
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();

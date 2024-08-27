@@ -3,6 +3,7 @@ package com.paulcera.pb_suite_api.security.controller;
 import com.paulcera.pb_suite_api.security.dto.ResponseMessage;
 import com.paulcera.pb_suite_api.security.exception.AlreadyLoggedInException;
 import com.paulcera.pb_suite_api.security.exception.InvalidCredentialsException;
+import com.paulcera.pb_suite_api.security.exception.InvalidRefreshTokenException;
 import com.paulcera.pb_suite_api.security.exception.TokenNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class AuthenticationControllerAdvice {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(TokenNotFoundException.class)
+    @ExceptionHandler({TokenNotFoundException.class, InvalidRefreshTokenException.class})
     public ResponseEntity<ResponseMessage> handleTokenNotFoundException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(ex.getMessage()));
     }
