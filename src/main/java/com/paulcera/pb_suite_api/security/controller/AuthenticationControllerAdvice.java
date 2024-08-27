@@ -2,19 +2,19 @@ package com.paulcera.pb_suite_api.security.controller;
 
 import com.paulcera.pb_suite_api.security.dto.ResponseMessage;
 import com.paulcera.pb_suite_api.security.exception.AlreadyLoggedInException;
-import com.paulcera.pb_suite_api.security.exception.InvalidCredentialsException;
 import com.paulcera.pb_suite_api.security.exception.InvalidRefreshTokenException;
 import com.paulcera.pb_suite_api.security.exception.TokenNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice(assignableTypes = AuthenticationController.class)
 public class AuthenticationControllerAdvice {
 
-    @ExceptionHandler({InvalidCredentialsException.class, AccessDeniedException.class})
+    @ExceptionHandler({BadCredentialsException.class, AccessDeniedException.class})
     public ResponseEntity<ResponseMessage> handleUnauthorizedException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage(ex.getMessage()));
     }

@@ -1,7 +1,6 @@
 package com.paulcera.pb_suite_api.security.service;
 
 import com.paulcera.pb_suite_api.security.dto.LoginRequest;
-import com.paulcera.pb_suite_api.security.exception.InvalidCredentialsException;
 import com.paulcera.pb_suite_api.security.exception.InvalidRefreshTokenException;
 import com.paulcera.pb_suite_api.security.model.AuthenticationToken;
 import com.paulcera.pb_suite_api.security.model.UserPrincipal;
@@ -31,10 +30,6 @@ public class AuthenticationService {
     public AuthenticationToken authenticate(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-
-        if (!authentication.isAuthenticated()) {
-            throw new InvalidCredentialsException("Invalid credentials.");
-        }
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         WebUser webUser = userPrincipal.webUser();

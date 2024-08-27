@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import com.paulcera.pb_suite_api.security.dto.LoginRequest;
 import com.paulcera.pb_suite_api.security.dto.LoginRequestMother;
-import com.paulcera.pb_suite_api.security.exception.InvalidCredentialsException;
 import com.paulcera.pb_suite_api.security.exception.InvalidRefreshTokenException;
 import com.paulcera.pb_suite_api.security.model.AuthenticationToken;
 import com.paulcera.pb_suite_api.security.model.UserPrincipal;
@@ -26,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -47,7 +47,6 @@ class AuthenticationServiceTest {
     void authenticate_hasValidCredentials_success() {
         LoginRequest loginRequest = LoginRequestMother.admin();
         Authentication mockedAuthentication = mock(Authentication.class);
-        when(mockedAuthentication.isAuthenticated()).thenReturn(true);
         UserPrincipal userPrincipal = UserPrincipalMother.admin();
         when(mockedAuthentication.getPrincipal()).thenReturn(userPrincipal);
 
@@ -65,18 +64,16 @@ class AuthenticationServiceTest {
     @Test
     void authenticate_hasInvalidCredentials_throwsException() {
         LoginRequest loginRequest = LoginRequestMother.admin();
-        Authentication mockedAuthentication = mock(Authentication.class);
-        when(mockedAuthentication.isAuthenticated()).thenReturn(false);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+            .thenThrow(new BadCredentialsException("Bad credentials"));
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(mockedAuthentication);
-
-        InvalidCredentialsException thrown = assertThrows(
-            InvalidCredentialsException.class,
+        BadCredentialsException thrown = assertThrows(
+            BadCredentialsException.class,
             () -> authenticationService.authenticate(loginRequest),
-            "Expected authenticate() to throw InvalidCredentialsException, but it didn't"
+            "Expected authenticate() to throw BadCredentialsException, but it didn't"
         );
 
-        assertEquals("Invalid credentials.", thrown.getMessage());
+        assertEquals("Bad credentials", thrown.getMessage());
     }
 
     @Test
