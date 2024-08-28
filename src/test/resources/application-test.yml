@@ -3,7 +3,7 @@ spring:
     name: Perfect Blend Suite API Test
     security:
       jwt:
-        secret-key: test-secret-key
+        secret-key: c29tZSBzZWNyZXQgdGhhdCBpcyBhdCBsZWFzdCAyNTYgYml0yyBsb25n
         access-token-expiration: 86400000
         refresh-token-expiration: 31536000000
   datasource:

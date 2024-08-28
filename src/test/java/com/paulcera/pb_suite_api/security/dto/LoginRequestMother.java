@@ -6,4 +6,8 @@ public class LoginRequestMother {
         return new LoginRequest("admin", "admin");
     }
 
+    public static LoginRequest adminIncorrect() {
+        return new LoginRequest("admin", "adminx");
+    }
+
 }
