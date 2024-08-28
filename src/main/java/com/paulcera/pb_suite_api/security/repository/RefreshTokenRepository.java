@@ -11,6 +11,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Inte
 
     Optional<RefreshToken> findByToken(String token);
 
+    boolean existsByToken(String refreshToken);
+
     @Query("SELECT (count(token) > 0) FROM RefreshToken token WHERE token.token = :refreshToken AND token.revokedDate IS NOT NULL")
     boolean isTokenRevoked(String refreshToken);
 

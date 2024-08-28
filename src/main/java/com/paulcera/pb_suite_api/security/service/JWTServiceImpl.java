@@ -110,8 +110,9 @@ public class JWTServiceImpl implements JWTService {
     @Override
     public boolean isValidRefreshToken(String refreshToken) {
         boolean isTokenNotExpired = !isTokenExpired(refreshToken);
+        boolean isTokenExisting = refreshTokenRepository.existsByToken(refreshToken);
         boolean isTokenNotRevoked = !refreshTokenRepository.isTokenRevoked(refreshToken);
 
-        return isTokenNotExpired && isTokenNotRevoked;
+        return isTokenNotExpired && isTokenExisting && isTokenNotRevoked;
     }
 }
