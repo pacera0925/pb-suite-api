@@ -4,12 +4,19 @@ public class WebUserMother {
 
     public static WebUser admin() {
         WebUser webUser = new WebUser();
+        webUser.setId(1);
         webUser.setUsername("admin");
         webUser.setPassword("admin");
-        FullName fullName = new FullName();
-        fullName.setFirstName("PB");
-        fullName.setLastName("Admin");
-        webUser.setFullName(fullName);
+        webUser.setFullName(new FullName("PB", "Admin"));
+        return webUser;
+    }
+
+    public static WebUser joe() {
+        WebUser webUser = new WebUser();
+        webUser.setId(2);
+        webUser.setUsername("joe");
+        webUser.setPassword("mama");
+        webUser.setFullName(new FullName("Joe", "Mama"));
         return webUser;
     }
 }
