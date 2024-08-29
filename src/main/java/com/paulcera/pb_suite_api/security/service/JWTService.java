@@ -11,7 +11,7 @@ public interface JWTService {
 
     String extractUsername(String token);
 
-    boolean isTokenValid(String token, UserDetails userDetails);
+    boolean isTokenValidForUser(String token, UserDetails userDetails);
 
     void invalidateToken(String token);
 

@@ -5,6 +5,8 @@ import com.paulcera.pb_suite_api.security.model.RefreshToken;
 import com.paulcera.pb_suite_api.security.model.WebUser;
 import com.paulcera.pb_suite_api.security.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -84,17 +86,14 @@ public class JWTServiceImpl implements JWTService {
     }
 
     @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String userName = extractUsername(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
+    public boolean isTokenValidForUser(String token, UserDetails userDetails) {
+        try {
+            final String username = extractUsername(token);
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+            return (username.equals(userDetails.getUsername()));
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
     }
 
     @Override
@@ -109,10 +108,22 @@ public class JWTServiceImpl implements JWTService {
 
     @Override
     public boolean isValidRefreshToken(String refreshToken) {
-        boolean isTokenNotExpired = !isTokenExpired(refreshToken);
         boolean isTokenExisting = refreshTokenRepository.existsByToken(refreshToken);
         boolean isTokenNotRevoked = !refreshTokenRepository.isTokenRevoked(refreshToken);
 
-        return isTokenNotExpired && isTokenExisting && isTokenNotRevoked;
+        return isTokenValid(refreshToken) && isTokenExisting && isTokenNotRevoked;
+    }
+
+    private boolean isTokenValid(String token) {
+        try {
+            Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token);
+
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
