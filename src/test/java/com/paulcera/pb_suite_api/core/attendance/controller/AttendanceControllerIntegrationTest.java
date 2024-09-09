@@ -72,4 +72,23 @@ class AttendanceControllerIntegrationTest extends BaseIntegrationTestController 
             .andExpect(jsonPath("$.payload").isNotEmpty())
             .andExpect(jsonPath("$.payload.content").isNotEmpty());
     }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"USER"})
+    void getAttendanceForUser_invalidNonExistingUser_badRequest() throws Exception {
+        mockMvc.perform(get("/api/attendance/user/0"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("No user found with id: 0"))
+            .andExpect(jsonPath("$.payload").isEmpty());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"USER"})
+    void getAttendanceForUser_validExistingUser_success() throws Exception {
+        mockMvc.perform(get("/api/attendance/user/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Successfully retrieved attendance of user 1"))
+            .andExpect(jsonPath("$.payload").isNotEmpty())
+            .andExpect(jsonPath("$.payload.content").isNotEmpty());
+    }
 }
