@@ -64,4 +64,27 @@ class AttendanceServiceTest {
 
         verify(attendanceRecordRepository, times(1)).findAllPageable(mockedPageable);
     }
+
+    @Test
+    void getAttendanceForUser_nonExistingUser_throwsException() {
+        Integer nonExistingUserId = 0;
+        when(webUserRepository.existsById(nonExistingUserId)).thenReturn(false);
+
+        UserNotFoundException thrown = assertThrows(UserNotFoundException.class,
+            () -> attendanceService.getAttendanceForUser(nonExistingUserId, mock(Pageable.class)),
+            "Expected getAttendanceForUser() to throw UserNotFoundException, but it didn't");
+
+        assertEquals("No user found with id: 0", thrown.getMessage());
+    }
+
+    @Test
+    void getAttendanceForUser_existingUser_success() {
+        Integer userId = 1;
+        Pageable mockedPageable = mock(Pageable.class);
+        when(webUserRepository.existsById(userId)).thenReturn(true);
+
+        attendanceService.getAttendanceForUser(userId, mockedPageable);
+
+        verify(attendanceRecordRepository, times(1)).findByUserIdPageable(userId, mockedPageable);
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,11 +38,20 @@ public class AttendanceController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseMessage> getAttendance(@PageableDefault(size = 25) Pageable pageable) {
+    public ResponseEntity<ResponseMessage> getAttendance(@PageableDefault(size = 30) Pageable pageable) {
 
         Page<DailyAttendanceView> result = attendanceService.getAttendance(pageable);
 
         return ResponseEntity.ok(new ResponseMessage("Successfully retrieved attendance for all users", result));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ResponseMessage> getAttendanceForUser(@PathVariable Integer userId,
+        @PageableDefault(size = 30) Pageable pageable) {
+
+        Page<DailyAttendanceView> result = attendanceService.getAttendanceForUser(userId, pageable);
+
+        return ResponseEntity.ok(new ResponseMessage("Successfully retrieved attendance of user " + userId, result));
     }
 
 }

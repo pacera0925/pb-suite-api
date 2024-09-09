@@ -41,4 +41,14 @@ public class AttendanceService {
     public Page<DailyAttendanceView> getAttendance(Pageable pageable) {
         return attendanceRecordRepository.findAllPageable(pageable);
     }
+
+    @PreAuthorize("hasAuthority('USER')")
+    public Page<DailyAttendanceView> getAttendanceForUser(Integer userId, Pageable pageable) {
+        boolean isUserExisting = webUserRepository.existsById(userId);
+        if (!isUserExisting) {
+            throw new UserNotFoundException("No user found with id: " + userId);
+        }
+
+        return attendanceRecordRepository.findByUserIdPageable(userId, pageable);
+    }
 }
