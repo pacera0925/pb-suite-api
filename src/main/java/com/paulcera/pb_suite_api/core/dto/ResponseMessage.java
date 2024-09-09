@@ -1,4 +1,4 @@
-package com.paulcera.pb_suite_api.security.dto;
+package com.paulcera.pb_suite_api.core.dto;
 
 import lombok.Data;
 import lombok.ToString;
@@ -9,14 +9,14 @@ public class ResponseMessage {
 
     private String message;
 
-    private Object content;
+    private Object payload;
 
     public ResponseMessage(String message) {
         this(message, null);
     }
 
-    public ResponseMessage(String message, Object content) {
+    public ResponseMessage(String message, Object payload) {
         this.message = message;
-        this.content = content;
+        this.payload = payload;
     }
 }

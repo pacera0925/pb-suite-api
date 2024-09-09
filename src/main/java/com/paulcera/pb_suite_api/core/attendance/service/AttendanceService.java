@@ -1,6 +1,7 @@
 package com.paulcera.pb_suite_api.core.attendance.service;
 
 import com.paulcera.pb_suite_api.core.attendance.dto.AttendanceLogForm;
+import com.paulcera.pb_suite_api.core.attendance.dto.DailyAttendanceView;
 import com.paulcera.pb_suite_api.core.attendance.model.AttendancePhoto;
 import com.paulcera.pb_suite_api.core.attendance.model.AttendanceRecord;
 import com.paulcera.pb_suite_api.core.attendance.repository.AttendanceRecordRepository;
@@ -8,6 +9,8 @@ import com.paulcera.pb_suite_api.core.exception.UserNotFoundException;
 import com.paulcera.pb_suite_api.security.model.WebUser;
 import com.paulcera.pb_suite_api.security.repository.WebUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -34,4 +37,8 @@ public class AttendanceService {
         attendanceRecordRepository.save(new AttendanceRecord(webUser, photo));
     }
 
+    @PreAuthorize("hasAuthority('USER')")
+    public Page<DailyAttendanceView> getAttendance(Pageable pageable) {
+        return attendanceRecordRepository.findAllPageable(pageable);
+    }
 }

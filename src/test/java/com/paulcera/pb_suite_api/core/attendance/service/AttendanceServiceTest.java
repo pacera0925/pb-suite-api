@@ -3,6 +3,7 @@ package com.paulcera.pb_suite_api.core.attendance.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class AttendanceServiceTest {
@@ -55,4 +57,11 @@ class AttendanceServiceTest {
         verify(attendanceRecordRepository, times(1)).save(any(AttendanceRecord.class));
     }
 
+    @Test
+    void getAttendance_callsExpectedRepositoryMethod() {
+        Pageable mockedPageable = mock(Pageable.class);
+        attendanceService.getAttendance(mockedPageable);
+
+        verify(attendanceRecordRepository, times(1)).findAllPageable(mockedPageable);
+    }
 }

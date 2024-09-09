@@ -1,6 +1,7 @@
-package com.paulcera.pb_suite_api.security.controller;
+package com.paulcera.pb_suite_api.core.advice;
 
-import com.paulcera.pb_suite_api.security.dto.ResponseMessage;
+import com.paulcera.pb_suite_api.core.dto.ResponseMessage;
+import com.paulcera.pb_suite_api.core.exception.UserNotFoundException;
 import com.paulcera.pb_suite_api.security.exception.AlreadyLoggedInException;
 import com.paulcera.pb_suite_api.security.exception.InvalidRefreshTokenException;
 import com.paulcera.pb_suite_api.security.exception.TokenNotFoundException;
@@ -11,26 +12,26 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice(assignableTypes = AuthenticationController.class)
-public class AuthenticationControllerAdvice {
+@ControllerAdvice
+public class DefaultControllerAdvice {
 
     @ExceptionHandler({BadCredentialsException.class, AccessDeniedException.class})
-    public ResponseEntity<ResponseMessage> handleUnauthorizedException(RuntimeException ex) {
+    public ResponseEntity<ResponseMessage> unauthorizedExceptionHandler(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(AlreadyLoggedInException.class)
-    public ResponseEntity<ResponseMessage> handleAlreadyLoggedInException(RuntimeException ex) {
+    public ResponseEntity<ResponseMessage> conflictExceptionHandler(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler({TokenNotFoundException.class, InvalidRefreshTokenException.class})
-    public ResponseEntity<ResponseMessage> handleTokenNotFoundException(RuntimeException ex) {
+    @ExceptionHandler({TokenNotFoundException.class, InvalidRefreshTokenException.class, UserNotFoundException.class})
+    public ResponseEntity<ResponseMessage> badRequestExceptionHandler(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseMessage> handleGenericException(Exception ex) {
+    public ResponseEntity<ResponseMessage> internalServerErrorExceptionHandler(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessage("An unexpected error occurred."));
     }
 

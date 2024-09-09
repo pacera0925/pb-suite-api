@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paulcera.pb_suite_api.core.controller.BaseIntegrationTestController;
 import com.paulcera.pb_suite_api.security.dto.LoginRequest;
 import com.paulcera.pb_suite_api.security.dto.LoginRequestMother;
 import com.paulcera.pb_suite_api.security.filter.JWTFilter;
@@ -19,32 +19,16 @@ import com.paulcera.pb_suite_api.security.service.JWTService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
 @Sql(scripts = "/authentication-controller-dataset.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-class AuthenticationControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+@Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
+class AuthenticationControllerIntegrationTest extends BaseIntegrationTestController {
 
     @Autowired
     private JWTService jwtService;
@@ -77,8 +61,8 @@ class AuthenticationControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("Successfully logged in."))
-            .andExpect(jsonPath("$.content.access_token").isNotEmpty())
-            .andExpect(jsonPath("$.content.refresh_token").isNotEmpty());
+            .andExpect(jsonPath("$.payload.access_token").isNotEmpty())
+            .andExpect(jsonPath("$.payload.refresh_token").isNotEmpty());
     }
 
     @Test
@@ -90,7 +74,7 @@ class AuthenticationControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.message").value("Bad credentials"))
-            .andExpect(jsonPath("$.content").isEmpty());
+            .andExpect(jsonPath("$.payload").isEmpty());
     }
 
     @Test
@@ -104,7 +88,7 @@ class AuthenticationControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.message").value("Already logged in."))
-            .andExpect(jsonPath("$.content").isEmpty());
+            .andExpect(jsonPath("$.payload").isEmpty());
     }
 
     @Test
@@ -116,7 +100,7 @@ class AuthenticationControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message", startsWith("No RefreshToken found with value: ")))
-            .andExpect(jsonPath("$.content").isEmpty());
+            .andExpect(jsonPath("$.payload").isEmpty());
     }
 
     @Test
@@ -131,7 +115,7 @@ class AuthenticationControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("Successfully logged out."))
-            .andExpect(jsonPath("$.content").isEmpty());
+            .andExpect(jsonPath("$.payload").isEmpty());
 
         RefreshToken updatedRefreshToken = refreshTokenRepository.findByToken(refreshToken)
             .orElseThrow(() -> new IllegalStateException("Expected dataset should contain this refresh_token"));
@@ -148,7 +132,7 @@ class AuthenticationControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("RefreshToken is not valid."))
-            .andExpect(jsonPath("$.content").isEmpty());
+            .andExpect(jsonPath("$.payload").isEmpty());
     }
 
     @Test
@@ -163,8 +147,8 @@ class AuthenticationControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("New token issued."))
-            .andExpect(jsonPath("$.content.access_token").isNotEmpty())
-            .andExpect(jsonPath("$.content.refresh_token").isNotEmpty());
+            .andExpect(jsonPath("$.payload.access_token").isNotEmpty())
+            .andExpect(jsonPath("$.payload.refresh_token").isNotEmpty());
     }
 
 }

@@ -1,12 +1,16 @@
 package com.paulcera.pb_suite_api.core.attendance.controller;
 
 import com.paulcera.pb_suite_api.core.attendance.dto.AttendanceLogForm;
+import com.paulcera.pb_suite_api.core.attendance.dto.DailyAttendanceView;
 import com.paulcera.pb_suite_api.core.attendance.service.AttendanceService;
-import com.paulcera.pb_suite_api.security.dto.ResponseMessage;
+import com.paulcera.pb_suite_api.core.dto.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,11 +28,20 @@ public class AttendanceController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseMessage> logUserAttendance(@RequestParam Integer id, @RequestParam MultipartFile photo) {
+    public ResponseEntity<ResponseMessage> logUserAttendance(@RequestParam Integer id,
+        @RequestParam MultipartFile photo) {
+
         attendanceService.logUserAttendance(new AttendanceLogForm(id, photo));
+
         return ResponseEntity.ok(new ResponseMessage("Successfully logged user attendance."));
     }
 
-    //TODO: @GetMapping("/user/{userId}") PAGEABLE
+    @GetMapping
+    public ResponseEntity<ResponseMessage> getAttendance(@PageableDefault(size = 25) Pageable pageable) {
+
+        Page<DailyAttendanceView> result = attendanceService.getAttendance(pageable);
+
+        return ResponseEntity.ok(new ResponseMessage("Successfully retrieved attendance for all users", result));
+    }
 
 }

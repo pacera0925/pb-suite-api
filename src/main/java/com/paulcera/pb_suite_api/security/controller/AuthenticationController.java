@@ -1,7 +1,7 @@
 package com.paulcera.pb_suite_api.security.controller;
 
+import com.paulcera.pb_suite_api.core.dto.ResponseMessage;
 import com.paulcera.pb_suite_api.security.dto.LoginRequest;
-import com.paulcera.pb_suite_api.security.dto.ResponseMessage;
 import com.paulcera.pb_suite_api.security.exception.AlreadyLoggedInException;
 import com.paulcera.pb_suite_api.security.model.AuthenticationToken;
 import com.paulcera.pb_suite_api.security.service.AuthenticationService;
